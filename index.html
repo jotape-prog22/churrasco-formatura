@@ -68,7 +68,19 @@
     <p class="aviso" id="aviso-bebida" role="alert"></p>
     <div class="linha-btns">
       <button class="btn vazado" type="button" id="voltar-bebida">◀ Voltar</button>
-      <button class="btn" type="button" id="confirmar">Confirmar ★</button>
+      <button class="btn" type="button" id="revisar">Revisar ▶</button>
+    </div>
+  </section>
+
+  <!-- REVISÃO antes de enviar -->
+  <section class="fase" id="fase-revisao" hidden>
+    <p class="fase-num">Confira antes de enviar</p>
+    <h2>Está tudo certo?</h2>
+    <dl class="ficha" id="resumo"></dl>
+    <p class="aviso" id="aviso-envio" role="alert"></p>
+    <div class="linha-btns">
+      <button class="btn vazado" type="button" id="editar">◀ Editar</button>
+      <button class="btn" type="button" id="enviar">Enviar ★</button>
     </div>
   </section>
 
@@ -77,7 +89,6 @@
     <p class="grande" id="fim-titulo"></p>
     <p id="fim-texto"></p>
     <p class="sub pisca" id="fim-rodape"></p>
-    <button class="btn vazado" type="button" id="recomecar">Responder de novo</button>
   </section>
 
   <p class="rodape">© Turma de formandos · Fogo!</p>
@@ -87,8 +98,8 @@
 <script src="comum.js?v=3"></script>
 <script>
   const $ = (id) => document.getElementById(id);
-  const fases = ["fase-nome", "fase-vai", "fase-acomp", "fase-bebida", "fase-fim"];
-  const estado = { nome: "", acompanhantes: {} };
+  const fases = ["fase-nome", "fase-vai", "fase-acomp", "fase-bebida", "fase-revisao", "fase-fim"];
+  const estado = { nome: "", vai: null, acompanhantes: {} };
 
   function mostrar(id) {
     fases.forEach((f) => ($(f).hidden = f !== id));
@@ -141,6 +152,27 @@
     mostrar("fase-vai");
   });
 
+  function revisar(vai) {
+    estado.vai = vai;
+    const nomesAcomp = TIPOS_ACOMP.filter((t) => estado.acompanhantes[t.id] > 0)
+      .map((t) => `${estado.acompanhantes[t.id]}× ${t.nome}`);
+    const nomesBebidas = BEBIDAS.filter((b) => $("beb-" + b.id).checked).map((b) => b.nome);
+    const itens = [["NOME", estado.nome], ["VAI?", vai ? "Sim, vou!" : "Não vou"]];
+    if (vai) {
+      itens.push(["LEVA", nomesAcomp.join(", ") || "Só eu"]);
+      itens.push(["BEBE", nomesBebidas.join(", ")]);
+    }
+    $("resumo").replaceChildren(...itens.flatMap(([k, v]) => {
+      const dt = document.createElement("dt");
+      const dd = document.createElement("dd");
+      dt.textContent = k;
+      dd.textContent = v;
+      return [dt, dd];
+    }));
+    $("aviso-envio").textContent = "";
+    mostrar("fase-revisao");
+  }
+
   async function enviar(vai, botao, aviso) {
     const bebidas = vai ? BEBIDAS.filter((b) => $("beb-" + b.id).checked).map((b) => b.id) : [];
     const acompanhantes = vai
@@ -171,18 +203,20 @@
   }
 
   $("btn-vou").addEventListener("click", () => mostrar("fase-acomp"));
-  $("btn-nao-vou").addEventListener("click", (e) => enviar(false, e.currentTarget, $("aviso-vai")));
+  $("btn-nao-vou").addEventListener("click", () => revisar(false));
   $("voltar-acomp").addEventListener("click", () => mostrar("fase-vai"));
   $("seguir-acomp").addEventListener("click", () => mostrar("fase-bebida"));
   $("voltar-bebida").addEventListener("click", () => mostrar("fase-acomp"));
-  $("confirmar").addEventListener("click", (e) => {
+  $("revisar").addEventListener("click", () => {
     if (!BEBIDAS.some((b) => $("beb-" + b.id).checked)) {
       $("aviso-bebida").textContent = "Escolha pelo menos uma bebida.";
       return;
     }
-    enviar(true, e.currentTarget, $("aviso-bebida"));
+    $("aviso-bebida").textContent = "";
+    revisar(true);
   });
-  $("recomecar").addEventListener("click", () => location.reload());
+  $("editar").addEventListener("click", () => mostrar(estado.vai ? "fase-bebida" : "fase-vai"));
+  $("enviar").addEventListener("click", (e) => enviar(estado.vai, e.currentTarget, $("aviso-envio")));
 </script>
 </body>
 </html>
