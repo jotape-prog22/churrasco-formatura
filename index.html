@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Churrasco de Formatura</title>
+<meta name="description" content="Confirme sua presença no churrasco de formatura — 05/12, Barra da Tijuca.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="tela">
+  <header class="topo">
+    <span data-estrela></span>
+    <p class="sub">Player 1 · Insert coin</p>
+    <h1>Churrasco de Formatura</h1>
+  </header>
+
+  <dl class="ficha">
+    <dt>DATA</dt><dd>Sábado, 05/12</dd>
+    <dt>LOCAL</dt><dd>Churrasqueira · Rua Cesar Lattes, 560 — Barra da Tijuca</dd>
+    <dt>MAPA</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=Rua+Cesar+Lattes+560+Barra+da+Tijuca+Rio+de+Janeiro" target="_blank" rel="noopener">Abrir no Google Maps</a></dd>
+  </dl>
+
+  <!-- FASE 1-1: nome -->
+  <form class="fase" id="fase-nome" novalidate>
+    <p class="fase-num">Fase 1-1</p>
+    <label class="campo" for="nome">
+      <h2>Qual é o seu nome?</h2>
+      <input type="text" id="nome" name="nome" autocomplete="name" maxlength="80" placeholder="Nome e sobrenome" required>
+    </label>
+    <p class="aviso" id="aviso-nome" role="alert"></p>
+    <button class="btn" type="submit">Start ▶</button>
+  </form>
+
+  <!-- FASE 1-2: vai ou não vai -->
+  <section class="fase" id="fase-vai" hidden>
+    <p class="fase-num">Fase 1-2</p>
+    <h2 id="pergunta-vai">Você vai?</h2>
+    <div class="escolha">
+      <button class="btn" type="button" id="btn-vou">Vou!</button>
+      <button class="btn vazado" type="button" id="btn-nao-vou">Não vou</button>
+    </div>
+    <p class="aviso" id="aviso-vai" role="alert"></p>
+  </section>
+
+  <!-- FASE 1-3: acompanhantes -->
+  <section class="fase" id="fase-acomp" hidden>
+    <p class="fase-num">Fase 1-3</p>
+    <h2>Vai levar alguém?</h2>
+    <p class="dica">Marque quantos de cada. Se for só você, é só seguir.</p>
+    <div class="lista-acomp" id="lista-acomp"></div>
+    <div class="linha-btns">
+      <button class="btn vazado" type="button" id="voltar-acomp">◀ Voltar</button>
+      <button class="btn" type="button" id="seguir-acomp">Próxima fase ▶</button>
+    </div>
+  </section>
+
+  <!-- FASE 1-4: bebidas -->
+  <section class="fase" id="fase-bebida" hidden>
+    <p class="fase-num">Fase 1-4 · Fase final</p>
+    <h2>O que você gosta de beber?</h2>
+    <p class="dica">Pode marcar mais de um.</p>
+    <div class="bebidas" id="bebidas"></div>
+    <p class="aviso" id="aviso-bebida" role="alert"></p>
+    <div class="linha-btns">
+      <button class="btn vazado" type="button" id="voltar-bebida">◀ Voltar</button>
+      <button class="btn" type="button" id="confirmar">Confirmar ★</button>
+    </div>
+  </section>
+
+  <!-- FIM -->
+  <section class="fase fim" id="fase-fim" hidden>
+    <p class="grande" id="fim-titulo"></p>
+    <p id="fim-texto"></p>
+    <p class="sub pisca" id="fim-rodape"></p>
+    <button class="btn vazado" type="button" id="recomecar">Responder de novo</button>
+  </section>
+
+  <p class="rodape">© Turma de formandos · Fogo!</p>
+</main>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const fases = ["fase-nome", "fase-vai", "fase-acomp", "fase-bebida", "fase-fim"];
+  const estado = { nome: "", acompanhantes: {} };
+
+  function mostrar(id) {
+    fases.forEach((f) => ($(f).hidden = f !== id));
+    const alvo = $(id).querySelector("input, button");
+    if (alvo) alvo.focus({ preventScroll: true });
+    $(id).scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // Acompanhantes
+  TIPOS_ACOMP.forEach((t) => {
+    estado.acompanhantes[t.id] = 0;
+    const linha = document.createElement("div");
+    linha.className = "acomp";
+    linha.innerHTML = `
+      <span>${t.nome}</span>
+      <div class="contador">
+        <button type="button" aria-label="Menos ${t.nome}" data-delta="-1">−</button>
+        <output id="qtd-${t.id}" aria-live="polite">0</output>
+        <button type="button" aria-label="Mais ${t.nome}" data-delta="1">+</button>
+      </div>`;
+    linha.addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-delta]");
+      if (!b) return;
+      const n = Math.max(0, Math.min(20, estado.acompanhantes[t.id] + Number(b.dataset.delta)));
+      estado.acompanhantes[t.id] = n;
+      $("qtd-" + t.id).textContent = n;
+      linha.classList.toggle("ativo", n > 0);
+    });
+    $("lista-acomp").appendChild(linha);
+  });
+
+  // Bebidas
+  BEBIDAS.forEach((b) => {
+    const l = document.createElement("label");
+    l.className = "bebida";
+    l.innerHTML = `<input type="checkbox" id="beb-${b.id}" value="${b.id}"><span>${b.nome}</span>`;
+    $("bebidas").appendChild(l);
+  });
+
+  $("fase-nome").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nome = $("nome").value.trim().replace(/\s+/g, " ");
+    if (nome.length < 2) {
+      $("aviso-nome").textContent = "Digite seu nome para começar.";
+      return;
+    }
+    $("aviso-nome").textContent = "";
+    estado.nome = nome;
+    $("pergunta-vai").textContent = `${nome.split(" ")[0]}, você vai?`;
+    mostrar("fase-vai");
+  });
+
+  async function enviar(vai, botao, aviso) {
+    const bebidas = vai ? BEBIDAS.filter((b) => $("beb-" + b.id).checked).map((b) => b.id) : [];
+    const acompanhantes = vai
+      ? Object.fromEntries(Object.entries(estado.acompanhantes).filter(([, n]) => n > 0))
+      : {};
+    botao.disabled = true;
+    aviso.textContent = "";
+    try {
+      await supabase("rsvps", { nome: estado.nome, vai, acompanhantes, bebidas }, { Prefer: "return=minimal" });
+      const extras = Object.values(acompanhantes).reduce((a, n) => a + n, 0);
+      if (vai) {
+        $("fim-titulo").textContent = "Presença confirmada!";
+        $("fim-texto").textContent = extras
+          ? `Valeu, ${estado.nome.split(" ")[0]}! Você + ${extras} acompanhante${extras > 1 ? "s" : ""}. Te vejo no dia 05/12.`
+          : `Valeu, ${estado.nome.split(" ")[0]}! Te vejo no dia 05/12.`;
+        $("fim-rodape").textContent = "Player ready · Fogo!";
+      } else {
+        $("fim-titulo").textContent = "Game over";
+        $("fim-texto").textContent = `Que pena, ${estado.nome.split(" ")[0]}. Obrigado por avisar!`;
+        $("fim-rodape").textContent = "Continue? 10… 9… 8…";
+      }
+      mostrar("fase-fim");
+    } catch (err) {
+      aviso.textContent = err.message + " Tente de novo.";
+    } finally {
+      botao.disabled = false;
+    }
+  }
+
+  $("btn-vou").addEventListener("click", () => mostrar("fase-acomp"));
+  $("btn-nao-vou").addEventListener("click", (e) => enviar(false, e.currentTarget, $("aviso-vai")));
+  $("voltar-acomp").addEventListener("click", () => mostrar("fase-vai"));
+  $("seguir-acomp").addEventListener("click", () => mostrar("fase-bebida"));
+  $("voltar-bebida").addEventListener("click", () => mostrar("fase-acomp"));
+  $("confirmar").addEventListener("click", (e) => {
+    if (!BEBIDAS.some((b) => $("beb-" + b.id).checked)) {
+      $("aviso-bebida").textContent = "Escolha pelo menos uma bebida.";
+      return;
+    }
+    enviar(true, e.currentTarget, $("aviso-bebida"));
+  });
+  $("recomecar").addEventListener("click", () => location.reload());
+</script>
+</body>
+</html>

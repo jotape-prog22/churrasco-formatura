@@ -1,0 +1,173 @@
+/* Layout: uma "tela de fliperama" centralizada sobre listras alvinegras, com scanlines de CRT por cima.
+   Tema único escuro de propósito (preto e branco do Botafogo). */
+:root {
+  --preto: #0a0a0a;
+  --carvao: #161616;
+  --cinza: #8a8a8a;
+  --cinza-claro: #cfcfcf;
+  --branco: #f5f5f5;
+  --erro: #ff5a5a;
+  --ok: #7dff9a;
+  --pixel: "Press Start 2P", "Courier New", monospace;
+  --texto: "VT323", "Courier New", monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--preto); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(90deg, var(--preto) 0 48px, var(--carvao) 48px 96px);
+  color: var(--branco);
+  font-family: var(--texto);
+  font-size: 22px;
+  line-height: 1.25;
+  padding-block: 32px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* scanlines */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
+  z-index: 50;
+}
+
+.tela {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--preto);
+  border: 4px solid var(--branco);
+  box-shadow: 0 0 0 4px var(--preto), 0 0 0 8px var(--branco), 12px 12px 0 8px rgba(0,0,0,.6);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.topo { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+
+.estrela { width: 64px; height: auto; image-rendering: pixelated; animation: piscar 1.6s steps(2) infinite; }
+@keyframes piscar { 50% { opacity: .55; } }
+
+h1, h2, .pixel {
+  font-family: var(--pixel);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  text-wrap: balance;
+  margin: 0;
+}
+h1 { font-size: clamp(15px, 4.4vw, 20px); line-height: 1.6; }
+h2 { font-size: 13px; line-height: 1.7; }
+.sub { font-family: var(--pixel); font-size: 10px; color: var(--cinza-claro); letter-spacing: .12em; }
+
+.ficha {
+  border-top: 2px dashed var(--cinza);
+  border-bottom: 2px dashed var(--cinza);
+  padding-block: 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  font-size: 22px;
+}
+.ficha dt { font-family: var(--pixel); font-size: 10px; color: var(--cinza); padding-top: 6px; }
+.ficha dd { margin: 0; min-width: 0; }
+.ficha a { color: var(--branco); }
+
+.fase { display: flex; flex-direction: column; gap: 16px; }
+.fase-num { font-family: var(--pixel); font-size: 10px; color: var(--cinza); letter-spacing: .14em; }
+
+label.campo { display: flex; flex-direction: column; gap: 8px; }
+
+input[type="text"], input[type="password"] {
+  font-family: var(--texto);
+  font-size: 26px;
+  background: var(--carvao);
+  color: var(--branco);
+  border: 3px solid var(--branco);
+  border-radius: 0;
+  padding: 8px 12px;
+  width: 100%;
+  caret-color: var(--branco);
+}
+input::placeholder { color: var(--cinza); }
+
+button { font: inherit; color: inherit; }
+
+.btn {
+  font-family: var(--pixel);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  background: var(--branco);
+  color: var(--preto);
+  border: 0;
+  padding: 14px 16px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--cinza);
+  transition: transform .06s steps(1), box-shadow .06s steps(1);
+}
+.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--cinza); }
+.btn.vazado { background: var(--preto); color: var(--branco); border: 3px solid var(--branco); }
+.btn:disabled { opacity: .5; cursor: wait; }
+
+:focus-visible { outline: 3px dashed var(--branco); outline-offset: 4px; }
+
+.linha-btns { display: flex; flex-wrap: wrap; gap: 14px; }
+.linha-btns > * { flex: 1 1 180px; }
+
+/* Opção grande vai / não vai */
+.escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.escolha .btn { padding: 22px 10px; font-size: 13px; line-height: 1.8; }
+
+/* Acompanhantes */
+.lista-acomp { display: flex; flex-direction: column; gap: 10px; }
+.acomp {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border: 2px solid var(--cinza); padding: 6px 8px 6px 12px;
+}
+.acomp span { min-width: 0; }
+.contador { display: flex; align-items: center; gap: 6px; }
+.contador button {
+  width: 38px; height: 38px; font-family: var(--pixel); font-size: 14px;
+  background: var(--preto); border: 2px solid var(--branco); cursor: pointer;
+}
+.contador output { font-family: var(--pixel); font-size: 14px; width: 30px; text-align: center; font-variant-numeric: tabular-nums; }
+.acomp.ativo { border-color: var(--branco); background: var(--carvao); }
+
+/* Bebidas */
+.bebidas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.bebida input { position: absolute; opacity: 0; pointer-events: none; }
+.bebida span {
+  display: flex; align-items: center; gap: 10px;
+  border: 2px solid var(--cinza); padding: 10px 12px; cursor: pointer; font-size: 24px;
+}
+.bebida span::before {
+  content: ""; width: 16px; height: 16px; border: 2px solid var(--branco); flex: none;
+}
+.bebida input:checked + span { border-color: var(--branco); background: var(--branco); color: var(--preto); }
+.bebida input:checked + span::before { background: var(--preto); border-color: var(--preto); box-shadow: inset 0 0 0 3px var(--branco); }
+.bebida input:focus-visible + span { outline: 3px dashed var(--branco); outline-offset: 3px; }
+
+.aviso { font-size: 22px; min-height: 1.2em; color: var(--erro); margin: 0; }
+.dica { color: var(--cinza-claro); margin: 0; }
+
+.fim { text-align: center; align-items: center; }
+.fim .grande { font-family: var(--pixel); font-size: clamp(18px, 6vw, 26px); line-height: 1.5; }
+.pisca { animation: piscar 1s steps(2) infinite; }
+
+.rodape { text-align: center; font-family: var(--pixel); font-size: 9px; color: var(--cinza); letter-spacing: .12em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .estrela, .pisca { animation: none; }
+  .btn { transition: none; }
+}

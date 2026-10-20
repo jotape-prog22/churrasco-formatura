@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Placar do Churrasco</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .tela { max-width: 760px; }
+  .placar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .placar div { border: 2px solid var(--branco); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .placar b { font-family: var(--pixel); font-size: 22px; font-weight: 400; font-variant-numeric: tabular-nums; }
+  .placar small { font-family: var(--pixel); font-size: 9px; color: var(--cinza-claro); letter-spacing: .1em; text-transform: uppercase; }
+  .placar .destaque { background: var(--branco); color: var(--preto); }
+  .placar .destaque small { color: var(--preto); }
+  .barras { display: flex; flex-direction: column; gap: 8px; }
+  .barra { display: grid; grid-template-columns: 9ch 1fr 4ch; gap: 10px; align-items: center; }
+  .barra .trilho { height: 18px; border: 2px solid var(--cinza); }
+  .barra .cheio { height: 100%; background: var(--branco); }
+  .barra .n { text-align: right; font-variant-numeric: tabular-nums; }
+  .tabela-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 20px; }
+  th { font-family: var(--pixel); font-size: 9px; font-weight: 400; text-align: left; color: var(--cinza); letter-spacing: .1em; padding: 6px 8px; border-bottom: 2px solid var(--cinza); }
+  td { padding: 6px 8px; border-bottom: 1px dashed var(--carvao); vertical-align: top; }
+  tr.nao td { color: var(--cinza); }
+  .status { font-size: 18px; color: var(--cinza-claro); margin: 0; }
+  .status .ponto { display: inline-block; width: 10px; height: 10px; background: var(--ok); margin-right: 8px; }
+  .duas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+  .duas > section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+</style>
+</head>
+<body>
+<main class="tela">
+  <header class="topo">
+    <span data-estrela></span>
+    <p class="sub">High score</p>
+    <h1>Placar do Churrasco</h1>
+  </header>
+
+  <form class="fase" id="login">
+    <label class="campo" for="senha">
+      <h2>Senha do painel</h2>
+      <input type="password" id="senha" autocomplete="current-password" required>
+    </label>
+    <p class="aviso" id="aviso-login" role="alert"></p>
+    <button class="btn" type="submit">Entrar ▶</button>
+  </form>
+
+  <div class="fase" id="painel" hidden>
+    <p class="status" id="status"></p>
+    <div class="placar">
+      <div class="destaque"><small>Total de pessoas</small><b id="t-pessoas">0</b></div>
+      <div><small>Confirmados</small><b id="t-sim">0</b></div>
+      <div><small>Acompanhantes</small><b id="t-acomp">0</b></div>
+      <div><small>Não vão</small><b id="t-nao">0</b></div>
+    </div>
+
+    <div class="duas">
+      <section>
+        <h2>Bebidas</h2>
+        <div class="barras" id="barras-bebidas"></div>
+      </section>
+      <section>
+        <h2>Acompanhantes</h2>
+        <div class="barras" id="barras-acomp"></div>
+      </section>
+    </div>
+
+    <h2>Respostas</h2>
+    <div class="tabela-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>Vai?</th><th>Acompanhantes</th><th>Bebidas</th><th>Quando</th></tr></thead>
+        <tbody id="linhas"></tbody>
+      </table>
+    </div>
+    <button class="btn vazado" type="button" id="sair">Sair</button>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const nomeBebida = Object.fromEntries(BEBIDAS.map((b) => [b.id, b.nome]));
+  const nomeAcomp = Object.fromEntries(TIPOS_ACOMP.map((t) => [t.id, t.nome]));
+  let senha = "";
+  let timer = null;
+
+  function ler(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } }
+  function gravar(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} }
+
+  function barras(el, itens) {
+    const max = Math.max(1, ...itens.map((i) => i.n));
+    el.replaceChildren(...itens.map((i) => {
+      const d = document.createElement("div");
+      d.className = "barra";
+      d.innerHTML = `<span></span><div class="trilho"><div class="cheio"></div></div><span class="n"></span>`;
+      d.children[0].textContent = i.nome;
+      d.querySelector(".cheio").style.width = (i.n / max) * 100 + "%";
+      d.children[2].textContent = i.n;
+      return d;
+    }));
+  }
+
+  function render(rows) {
+    const sim = rows.filter((r) => r.vai);
+    const acompPorTipo = Object.fromEntries(TIPOS_ACOMP.map((t) => [t.id, 0]));
+    const bebidaCont = Object.fromEntries(BEBIDAS.map((b) => [b.id, 0]));
+    sim.forEach((r) => {
+      Object.entries(r.acompanhantes || {}).forEach(([k, n]) => (acompPorTipo[k] = (acompPorTipo[k] || 0) + n));
+      (r.bebidas || []).forEach((b) => (bebidaCont[b] = (bebidaCont[b] || 0) + 1));
+    });
+    const totalAcomp = Object.values(acompPorTipo).reduce((a, n) => a + n, 0);
+    $("t-sim").textContent = sim.length;
+    $("t-acomp").textContent = totalAcomp;
+    $("t-pessoas").textContent = sim.length + totalAcomp;
+    $("t-nao").textContent = rows.length - sim.length;
+    barras($("barras-bebidas"), BEBIDAS.map((b) => ({ nome: b.nome, n: bebidaCont[b.id] })));
+    barras($("barras-acomp"), TIPOS_ACOMP.map((t) => ({ nome: t.nome.split(" ")[0], n: acompPorTipo[t.id] })));
+
+    $("linhas").replaceChildren(...rows.map((r) => {
+      const tr = document.createElement("tr");
+      if (!r.vai) tr.className = "nao";
+      const acomp = Object.entries(r.acompanhantes || {}).map(([k, n]) => `${n}× ${nomeAcomp[k] || k}`).join(", ");
+      const cels = [
+        r.nome,
+        r.vai ? "Sim" : "Não",
+        acomp || "—",
+        (r.bebidas || []).map((b) => nomeBebida[b] || b).join(", ") || "—",
+        new Date(r.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }),
+      ];
+      cels.forEach((c) => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); });
+      return tr;
+    }));
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="5">Ninguém respondeu ainda. Mande o link do site pra galera!</td>`;
+      $("linhas").replaceChildren(tr);
+    }
+  }
+
+  async function atualizar() {
+    try {
+      const rows = await supabase("rpc/admin_rsvps", { senha });
+      if (rows === null || !Array.isArray(rows)) throw new Error("Resposta inesperada do servidor.");
+      render(rows);
+      $("status").innerHTML = `<span class="ponto"></span>Ao vivo · atualizado às ${new Date().toLocaleTimeString("pt-BR")}`;
+      return true;
+    } catch (err) {
+      $("status").textContent = "Sem conexão: " + err.message;
+      throw err;
+    }
+  }
+
+  async function entrar(s) {
+    senha = s;
+    try {
+      await atualizar();
+    } catch (err) {
+      $("aviso-login").textContent = /401|403|senha/i.test(err.message) ? "Senha errada." : err.message;
+      gravar("senha-painel", "");
+      return;
+    }
+    gravar("senha-painel", s);
+    $("login").hidden = true;
+    $("painel").hidden = false;
+    clearInterval(timer);
+    timer = setInterval(() => atualizar().catch(() => {}), 5000);
+  }
+
+  $("login").addEventListener("submit", (e) => {
+    e.preventDefault();
+    $("aviso-login").textContent = "";
+    entrar($("senha").value);
+  });
+  $("sair").addEventListener("click", () => {
+    gravar("senha-painel", "");
+    location.reload();
+  });
+
+  const salva = ler("senha-painel");
+  if (salva) entrar(salva);
+</script>
+</body>
+</html>
