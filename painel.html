@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 <style>
   .tela { max-width: 760px; }
   .placar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
@@ -82,8 +82,8 @@
   </div>
 </main>
 
-<script src="config.js"></script>
-<script src="comum.js"></script>
+<script src="config.js?v=3"></script>
+<script src="comum.js?v=3"></script>
 <script>
   const $ = (id) => document.getElementById(id);
   const nomeBebida = Object.fromEntries(BEBIDAS.map((b) => [b.id, b.nome]));
