@@ -38,11 +38,8 @@ function desenharEstrela(el) {
 document.querySelectorAll("[data-estrela]").forEach(desenharEstrela);
 
 const TIPOS_ACOMP = [
-  { id: "conjuge", nome: "Cônjuge / Namorado(a)" },
-  { id: "filho", nome: "Filho(a)" },
-  { id: "sobrinho", nome: "Sobrinho(a)" },
-  { id: "irmao", nome: "Irmão" },
-  { id: "irma", nome: "Irmã" },
+  { id: "acompanhante", nome: "Acompanhante" },
+  { id: "outros", nome: "Outros" },
 ];
 
 const BEBIDAS = [
