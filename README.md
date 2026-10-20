@@ -1,6 +1,6 @@
 # Churrasco de Formatura
 
-Site de confirmação de presença (RSVP) do churrasco de formatura — 05/12, churrasqueira da Rua Cesar Lattes, 560 (Barra da Tijuca).
+Site de confirmação de presença (RSVP) do churrasco de formatura — sábado, 05/12, às 13h, na churrasqueira da Rua Cesar Lattes, 560 (Barra da Tijuca).
 
 - `index.html` — página dos convidados: nome → vai/não vai → acompanhantes → bebidas.
 - `painel.html` — placar ao vivo das respostas (pede a senha do painel, atualiza a cada 5 s).

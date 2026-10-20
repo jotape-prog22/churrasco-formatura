@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Churrasco de Formatura</title>
-<meta name="description" content="Confirme sua presença no churrasco de formatura — 05/12, Barra da Tijuca.">
+<meta name="description" content="Confirme sua presença no churrasco de formatura — 05/12, 13h, Barra da Tijuca.">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
   </header>
 
   <dl class="ficha">
-    <dt>DATA</dt><dd>Sábado, 05/12</dd>
+    <dt>DATA</dt><dd>Sábado, 05/12 · 13h</dd>
     <dt>LOCAL</dt><dd>Churrasqueira · Rua Cesar Lattes, 560 — Barra da Tijuca</dd>
     <dt>MAPA</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=Rua+Cesar+Lattes+560+Barra+da+Tijuca+Rio+de+Janeiro" target="_blank" rel="noopener">Abrir no Google Maps</a></dd>
   </dl>
@@ -154,8 +154,8 @@
       if (vai) {
         $("fim-titulo").textContent = "Presença confirmada!";
         $("fim-texto").textContent = extras
-          ? `Valeu, ${estado.nome.split(" ")[0]}! Você + ${extras} acompanhante${extras > 1 ? "s" : ""}. Te vejo no dia 05/12.`
-          : `Valeu, ${estado.nome.split(" ")[0]}! Te vejo no dia 05/12.`;
+          ? `Valeu, ${estado.nome.split(" ")[0]}! Você + ${extras} acompanhante${extras > 1 ? "s" : ""}. Te vejo no dia 05/12, às 13h.`
+          : `Valeu, ${estado.nome.split(" ")[0]}! Te vejo no dia 05/12, às 13h.`;
         $("fim-rodape").textContent = "Player ready · Fogo!";
       } else {
         $("fim-titulo").textContent = "Game over";
