@@ -8,14 +8,14 @@
 <meta name="theme-color" content="#0a0a0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap">
+<link rel="stylesheet" href="style.css?v=4">
 <style>
   .tela { max-width: 760px; }
   .placar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
   .placar div { border: 2px solid var(--branco); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-  .placar b { font-family: var(--pixel); font-size: 22px; font-weight: 400; font-variant-numeric: tabular-nums; }
-  .placar small { font-family: var(--pixel); font-size: 9px; color: var(--cinza-claro); letter-spacing: .1em; text-transform: uppercase; }
+  .placar b { font-family: var(--pixel); font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .placar small { font-family: var(--pixel); font-size: 12px; color: var(--cinza-claro); letter-spacing: .1em; text-transform: uppercase; }
   .placar .destaque { background: var(--branco); color: var(--preto); }
   .placar .destaque small { color: var(--preto); }
   .barras { display: flex; flex-direction: column; gap: 8px; }
@@ -25,7 +25,7 @@
   .barra .n { text-align: right; font-variant-numeric: tabular-nums; }
   .tabela-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 20px; }
-  th { font-family: var(--pixel); font-size: 9px; font-weight: 400; text-align: left; color: var(--cinza); letter-spacing: .1em; padding: 6px 8px; border-bottom: 2px solid var(--cinza); }
+  th { font-family: var(--pixel); font-size: 12px; font-weight: 400; text-align: left; color: var(--cinza); letter-spacing: .1em; padding: 6px 8px; border-bottom: 2px solid var(--cinza); }
   td { padding: 6px 8px; border-bottom: 1px dashed var(--carvao); vertical-align: top; }
   tr.nao td { color: var(--cinza); }
   .status { font-size: 18px; color: var(--cinza-claro); margin: 0; }
@@ -82,8 +82,8 @@
   </div>
 </main>
 
-<script src="config.js?v=3"></script>
-<script src="comum.js?v=3"></script>
+<script src="config.js?v=4"></script>
+<script src="comum.js?v=4"></script>
 <script>
   const $ = (id) => document.getElementById(id);
   const nomeBebida = Object.fromEntries(BEBIDAS.map((b) => [b.id, b.nome]));

@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#0a0a0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <main class="tela">
@@ -19,7 +19,7 @@
     <h1>Churrasco de Formatura do JP</h1>
   </header>
 
-  <dl class="ficha">
+  <dl class="ficha evento">
     <dt>DATA</dt><dd>Sábado, 05/12 · 13h</dd>
     <dt>LOCAL</dt><dd>Churrasqueira · Rua Cesar Lattes, 560 — Barra da Tijuca</dd>
     <dt>MAPA</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=Rua+Cesar+Lattes+560+Barra+da+Tijuca+Rio+de+Janeiro" target="_blank" rel="noopener">Abrir no Google Maps</a></dd>
@@ -94,18 +94,20 @@
   <p class="rodape">© Turma de formandos · Fogo!</p>
 </main>
 
-<script src="config.js?v=3"></script>
-<script src="comum.js?v=3"></script>
+<script src="config.js?v=4"></script>
+<script src="comum.js?v=4"></script>
 <script>
   const $ = (id) => document.getElementById(id);
   const fases = ["fase-nome", "fase-vai", "fase-acomp", "fase-bebida", "fase-revisao", "fase-fim"];
   const estado = { nome: "", vai: null, acompanhantes: {} };
 
+  // Uma fase por vez: a nova ocupa o lugar da anterior e a tela volta ao topo.
   function mostrar(id) {
     fases.forEach((f) => ($(f).hidden = f !== id));
+    document.body.classList.toggle("jogando", id !== "fase-nome" && id !== "fase-fim");
+    window.scrollTo(0, 0);
     const alvo = $(id).querySelector("input, button");
     if (alvo) alvo.focus({ preventScroll: true });
-    $(id).scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   // Acompanhantes
