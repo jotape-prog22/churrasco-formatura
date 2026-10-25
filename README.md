@@ -1,6 +1,6 @@
 # Churrasco de Formatura do JP
 
-Site de confirmação de presença (RSVP) do churrasco de formatura do JP — sábado, 05/12, às 13h, na churrasqueira da Rua Cesar Lattes, 560 (Barra da Tijuca).
+Site de confirmação de presença (RSVP) do churrasco de formatura do JP — domingo, 13/12, a partir das 13h, na churrasqueira da Rua Cesar Lattes, 560 (Barra da Tijuca).
 
 - `index.html` — página dos convidados: nome → vai/não vai → acompanhantes → bebidas.
 - `painel.html` — placar ao vivo das respostas (pede a senha do painel, atualiza a cada 5 s).
